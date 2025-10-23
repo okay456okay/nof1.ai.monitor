@@ -1,6 +1,19 @@
-# AI交易监控系统
+# nof1.ai AI交易监控系统
 
-一个用于监控AI大模型加密货币交易行为的自动化系统，当检测到交易变化时会通过企业微信群机器人发送通知。
+一个用于监控[AI trading in real markets](https://nof1.ai/) AI大模型加密货币交易行为的自动化系统，当检测到交易变化时会通过企业微信群机器人发送通知。
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+## ⚠️ 免责声明
+
+**本项目仅供学习和研究使用，不构成投资建议。**
+
+- 加密货币交易存在高风险，可能导致资金损失
+- 使用本系统进行交易决策的风险由用户自行承担
+- 作者不对任何交易损失负责
+- 请在使用前充分了解相关风险
 
 ## 功能特性
 
@@ -57,7 +70,7 @@ NOTIFICATION_TYPE=wechat
 MONITORED_MODELS=
 
 # API接口地址
-API_URL=https://nof1.ai/api/positions?limit=1000
+API_URL=https://nof1.ai/api/account-totals
 
 # 日志级别
 LOG_LEVEL=INFO
@@ -166,4 +179,23 @@ python main.py --log-level DEBUG
 
 ## 许可证
 
-本项目仅供学习和研究使用。
+本项目采用MIT许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## 贡献
+
+欢迎贡献代码！请查看 [CONTRIBUTING.md](CONTRIBUTING.md) 了解如何参与项目开发。
+
+## 安全
+
+如果您发现了安全漏洞，请查看 [SECURITY.md](SECURITY.md) 了解如何报告。
+
+## 联系方式
+
+如有问题或建议，请通过以下方式联系：
+
+- 创建 [GitHub Issue](https://github.com/your-username/nof1.ai.monitor/issues)
+- 发送邮件到：[your-email@example.com]
+
+---
+
+**再次提醒：本项目仅供学习和研究使用，不构成投资建议。加密货币交易存在高风险，请谨慎使用。**

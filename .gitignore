@@ -40,7 +40,9 @@ logs/
 # Data files
 current.json
 last.json
-*.json
+account-totals.json
+# 保留示例数据文件
+!account-totals.json.example
 
 # IDE
 .vscode/

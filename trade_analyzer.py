@@ -143,16 +143,24 @@ class TradeAnalyzer:
                 quantity = current_pos.get('quantity', 0)
                 leverage = current_pos.get('leverage', 1)
                 entry_price = current_pos.get('entry_price', 0)
+                current_price = current_pos.get('current_price', 0)
+                
+                # 判断买卖方向
+                if quantity > 0:
+                    direction = "买多"
+                else:
+                    direction = "卖空"
                 
                 trades.append({
                     'type': 'position_opened',
                     'model_id': model_id,
                     'symbol': symbol,
-                    'action': '买入' if quantity > 0 else '卖出',
+                    'action': direction,
                     'quantity': abs(quantity),
                     'leverage': leverage,
                     'entry_price': entry_price,
-                    'message': f"{model_id} {symbol} 新开仓: {'买入' if quantity > 0 else '卖出'} {abs(quantity)} (杠杆: {leverage}x, 价格: {entry_price})",
+                    'current_price': current_price,
+                    'message': f"{model_id} {symbol} 新开仓: {direction} {abs(quantity)} (杠杆: {leverage}x, 进入: {entry_price}, 当前: {current_price})",
                     'timestamp': datetime.now().isoformat()
                 })
                 return trades
@@ -161,7 +169,14 @@ class TradeAnalyzer:
                 # 平仓
                 last_quantity = last_pos.get('quantity', 0)
                 last_leverage = last_pos.get('leverage', 1)
-                last_price = last_pos.get('current_price', 0)
+                last_entry_price = last_pos.get('entry_price', 0)
+                last_current_price = last_pos.get('current_price', 0)
+                
+                # 判断原方向
+                if last_quantity > 0:
+                    direction = "买多"
+                else:
+                    direction = "卖空"
                 
                 trades.append({
                     'type': 'position_closed',
@@ -169,8 +184,10 @@ class TradeAnalyzer:
                     'symbol': symbol,
                     'last_quantity': last_quantity,
                     'last_leverage': last_leverage,
-                    'last_price': last_price,
-                    'message': f"{model_id} {symbol} 已平仓 (原仓位: {last_quantity}, 杠杆: {last_leverage}x, 价格: {last_price})",
+                    'last_entry_price': last_entry_price,
+                    'last_current_price': last_current_price,
+                    'direction': direction,
+                    'message': f"{model_id} {symbol} 已平仓 ({direction} {abs(last_quantity)}, 杠杆: {last_leverage}x, 进入: {last_entry_price}, 当前: {last_current_price})",
                     'timestamp': datetime.now().isoformat()
                 })
                 return trades
@@ -183,20 +200,33 @@ class TradeAnalyzer:
             current_quantity = current_pos.get('quantity', 0)
             last_leverage = last_pos.get('leverage', 1)
             current_leverage = current_pos.get('leverage', 1)
+            last_entry_price = last_pos.get('entry_price', 0)
+            current_entry_price = current_pos.get('entry_price', 0)
+            current_price = current_pos.get('current_price', 0)
             
             # 检查是否有变化
             if last_quantity != current_quantity or last_leverage != current_leverage:
                 quantity_change = current_quantity - last_quantity
                 
+                # 判断变化类型和方向
                 if quantity_change > 0:
                     # 加仓
-                    action = "买入"
+                    if current_quantity > 0:
+                        action = "加仓买多"
+                    else:
+                        action = "加仓卖空"
                 elif quantity_change < 0:
                     # 减仓
-                    action = "卖出"
+                    if current_quantity > 0:
+                        action = "减仓买多"
+                    else:
+                        action = "减仓卖空"
                 else:
                     # 杠杆变化但数量不变
-                    action = "调整杠杆"
+                    if current_quantity > 0:
+                        action = "调整买多杠杆"
+                    else:
+                        action = "调整卖空杠杆"
                 
                 trades.append({
                     'type': 'position_changed',
@@ -208,10 +238,13 @@ class TradeAnalyzer:
                     'current_quantity': current_quantity,
                     'last_leverage': last_leverage,
                     'current_leverage': current_leverage,
-                    'current_price': current_pos.get('current_price', 0),
+                    'last_entry_price': last_entry_price,
+                    'current_entry_price': current_entry_price,
+                    'current_price': current_price,
                     'message': self._format_trade_message(model_id, symbol, action, 
                                                         abs(quantity_change), last_quantity, current_quantity,
-                                                        last_leverage, current_leverage, current_pos.get('current_price', 0)),
+                                                        last_leverage, current_leverage, 
+                                                        last_entry_price, current_entry_price, current_price),
                     'timestamp': datetime.now().isoformat()
                 })
             
@@ -223,7 +256,8 @@ class TradeAnalyzer:
     
     def _format_trade_message(self, model_id: str, symbol: str, action: str, 
                             quantity_change: float, last_quantity: float, current_quantity: float,
-                            last_leverage: int, current_leverage: int, current_price: float) -> str:
+                            last_leverage: int, current_leverage: int, 
+                            last_entry_price: float, current_entry_price: float, current_price: float) -> str:
         """
         格式化交易消息
         
@@ -236,15 +270,17 @@ class TradeAnalyzer:
             current_quantity: 现仓位数量
             last_leverage: 原杠杆
             current_leverage: 现杠杆
+            last_entry_price: 原进入价格
+            current_entry_price: 现进入价格
             current_price: 当前价格
             
         Returns:
             格式化的交易消息
         """
-        if action == "调整杠杆":
-            return f"{model_id} {symbol} 调整杠杆: {last_leverage}x → {current_leverage}x (仓位: {current_quantity}, 价格: {current_price})"
+        if "调整" in action:
+            return f"{model_id} {symbol} {action}: {last_leverage}x → {current_leverage}x (仓位: {current_quantity}, 进入: {current_entry_price}, 当前: {current_price})"
         else:
-            return f"{model_id} {symbol} {action} {quantity_change}: {last_quantity} → {current_quantity} (杠杆: {last_leverage}x → {current_leverage}x, 价格: {current_price})"
+            return f"{model_id} {symbol} {action} {quantity_change}: {last_quantity} → {current_quantity} (杠杆: {last_leverage}x → {current_leverage}x, 进入: {last_entry_price} → {current_entry_price}, 当前: {current_price})"
     
     def generate_trade_summary(self, trades: List[Dict[str, Any]]) -> str:
         """
