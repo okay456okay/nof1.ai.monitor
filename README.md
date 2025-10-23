@@ -1,6 +1,6 @@
 # nof1.ai AI交易监控系统
 
-监控[AI trading in real markets](https://nof1.ai/) AI大模型加密货币交易行为的通知系统，当检测到交易变化时会通过企业微信群机器人发送通知。
+监控[AI trading in real markets](https://nof1.ai/) Alpha Arena AI大模型加密货币交易行为的通知系统，当检测到交易变化时会通过企业微信群机器人发送通知。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
@@ -17,7 +17,7 @@
 
 ## 功能特性
 
-- 🔄 **定时监控**: 每分钟自动获取持仓数据
+- 🔄 **定时监控**: 每分钟自动获取Alpha Arena持仓数据
 - 📊 **变化检测**: 智能分析持仓变化，识别交易行为
 - 📱 **实时通知**: 通过企业微信群机器人发送交易提醒
 - 🎯 **精准监控**: 支持指定特定模型进行监控
