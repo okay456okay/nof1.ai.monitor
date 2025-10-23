@@ -1,6 +1,6 @@
 # nof1.ai AI交易监控系统
 
-一个用于监控[AI trading in real markets](https://nof1.ai/) AI大模型加密货币交易行为的自动化系统，当检测到交易变化时会通过企业微信群机器人发送通知。
+监控[AI trading in real markets](https://nof1.ai/) AI大模型加密货币交易行为的通知系统，当检测到交易变化时会通过企业微信群机器人发送通知。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
