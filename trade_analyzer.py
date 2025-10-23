@@ -152,18 +152,25 @@ class TradeAnalyzer:
                     'quantity': abs(quantity),
                     'leverage': leverage,
                     'entry_price': entry_price,
-                    'message': f"{model_id} {symbol} 新开仓: {'买入' if quantity > 0 else '卖出'} {abs(quantity)} (杠杆: {leverage}x)",
+                    'message': f"{model_id} {symbol} 新开仓: {'买入' if quantity > 0 else '卖出'} {abs(quantity)} (杠杆: {leverage}x, 价格: {entry_price})",
                     'timestamp': datetime.now().isoformat()
                 })
                 return trades
             
             if last_pos and not current_pos:
                 # 平仓
+                last_quantity = last_pos.get('quantity', 0)
+                last_leverage = last_pos.get('leverage', 1)
+                last_price = last_pos.get('current_price', 0)
+                
                 trades.append({
                     'type': 'position_closed',
                     'model_id': model_id,
                     'symbol': symbol,
-                    'message': f"{model_id} {symbol} 已平仓",
+                    'last_quantity': last_quantity,
+                    'last_leverage': last_leverage,
+                    'last_price': last_price,
+                    'message': f"{model_id} {symbol} 已平仓 (原仓位: {last_quantity}, 杠杆: {last_leverage}x, 价格: {last_price})",
                     'timestamp': datetime.now().isoformat()
                 })
                 return trades
@@ -203,7 +210,8 @@ class TradeAnalyzer:
                     'current_leverage': current_leverage,
                     'current_price': current_pos.get('current_price', 0),
                     'message': self._format_trade_message(model_id, symbol, action, 
-                                                        abs(quantity_change), current_leverage),
+                                                        abs(quantity_change), last_quantity, current_quantity,
+                                                        last_leverage, current_leverage, current_pos.get('current_price', 0)),
                     'timestamp': datetime.now().isoformat()
                 })
             
@@ -214,7 +222,8 @@ class TradeAnalyzer:
             return []
     
     def _format_trade_message(self, model_id: str, symbol: str, action: str, 
-                            quantity_change: float, leverage: int) -> str:
+                            quantity_change: float, last_quantity: float, current_quantity: float,
+                            last_leverage: int, current_leverage: int, current_price: float) -> str:
         """
         格式化交易消息
         
@@ -223,15 +232,19 @@ class TradeAnalyzer:
             symbol: 交易对
             action: 交易动作
             quantity_change: 数量变化
-            leverage: 杠杆倍数
+            last_quantity: 原仓位数量
+            current_quantity: 现仓位数量
+            last_leverage: 原杠杆
+            current_leverage: 现杠杆
+            current_price: 当前价格
             
         Returns:
             格式化的交易消息
         """
         if action == "调整杠杆":
-            return f"{model_id} {symbol} 调整杠杆至 {leverage}x"
+            return f"{model_id} {symbol} 调整杠杆: {last_leverage}x → {current_leverage}x (仓位: {current_quantity}, 价格: {current_price})"
         else:
-            return f"{model_id} {symbol} {action} {quantity_change} (杠杆: {leverage}x)"
+            return f"{model_id} {symbol} {action} {quantity_change}: {last_quantity} → {current_quantity} (杠杆: {last_leverage}x → {current_leverage}x, 价格: {current_price})"
     
     def generate_trade_summary(self, trades: List[Dict[str, Any]]) -> str:
         """

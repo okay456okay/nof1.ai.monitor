@@ -40,7 +40,7 @@ pip install -r requirements.txt
 
 复制配置文件模板：
 ```bash
-cp config.env.example .env
+cp env.example .env
 ```
 
 编辑 `.env` 文件，配置以下参数：
@@ -95,7 +95,7 @@ python main.py --test
 python main.py --log-level DEBUG
 
 # 指定配置文件
-python main.py --config /path/to/config.env
+python main.py --config /path/to/.env
 ```
 
 ## 监控逻辑

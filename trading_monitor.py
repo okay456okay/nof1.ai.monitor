@@ -58,7 +58,7 @@ class TradingMonitor:
             # 1. 获取当前持仓数据
             current_data = self.position_fetcher.fetch_positions()
             if not current_data:
-                self.logger.error("获取持仓数据失败，跳过本次监控")
+                self.logger.info("获取持仓数据失败或为空，跳过本次监控")
                 return
             
             # 2. 保存当前数据
@@ -72,6 +72,7 @@ class TradingMonitor:
                 self.logger.info("首次运行，无历史数据可比较")
                 # 将当前数据重命名为历史数据，为下次比较做准备
                 self.position_fetcher.rename_current_to_last()
+                self.logger.info("监控任务执行完成（首次运行）")
                 return
             
             # 4. 分析持仓变化
@@ -95,7 +96,7 @@ class TradingMonitor:
             else:
                 self.logger.info("无交易变化")
             
-            # 6. 将当前数据重命名为历史数据
+            # 6. 将当前数据重命名为历史数据（只有在成功处理数据后才重命名）
             self.position_fetcher.rename_current_to_last()
             
             self.logger.info("监控任务执行完成")
