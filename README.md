@@ -1,4 +1,4 @@
-# nof1.ai Alpha Arena AI交易监控系统
+# nof1.ai Alpha Arena AI大模型交易监控系统
 
 监控[AI trading in real markets](https://nof1.ai/) Alpha Arena AI大模型加密货币交易行为的通知系统，当检测到交易变化时会通过企业微信群机器人发送通知。
 
