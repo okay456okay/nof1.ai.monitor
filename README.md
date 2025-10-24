@@ -1,4 +1,4 @@
-# nof1.ai AI交易监控系统
+# nof1.ai Alpha Arena AI交易监控系统
 
 监控[AI trading in real markets](https://nof1.ai/) Alpha Arena AI大模型加密货币交易行为的通知系统，当检测到交易变化时会通过企业微信群机器人发送通知。
 
@@ -193,8 +193,11 @@ python main.py --log-level DEBUG
 
 如有问题或建议，请通过以下方式联系：
 
-- 创建 [GitHub Issue](https://github.com/your-username/nof1.ai.monitor/issues)
-- 发送邮件到：[your-email@example.com]
+- 创建 [GitHub Issue](https://github.com/okay456okay/nof1.ai.monitor/issues)
+- X (Twitter): [@okay456okay](https://x.com/okay456okay)
+- 微信公众号：远见拾贝
+
+![远见拾贝公众号二维码](images/InSightPearl21_qrcode.jpg)
 
 ---
 
