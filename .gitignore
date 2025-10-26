@@ -41,6 +41,7 @@ logs/
 current.json
 last.json
 account-totals.json
+data/
 # 保留示例数据文件
 !account-totals.json.example
 

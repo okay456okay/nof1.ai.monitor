@@ -49,6 +49,38 @@ class PositionDataFetcher:
             self.logger.error(f"计算lastHourlyMarker失败: {e}")
             # 返回默认值
             return 129
+    
+    def save_data_to_file(self, data: Dict[str, Any], data_dir: str = "data") -> str:
+        """
+        保存数据到文件，文件名使用时间戳
+        
+        Args:
+            data: 要保存的数据
+            data_dir: 数据目录
+            
+        Returns:
+            保存的文件路径
+        """
+        try:
+            # 创建数据目录
+            if not os.path.exists(data_dir):
+                os.makedirs(data_dir)
+                self.logger.info(f"创建数据目录: {data_dir}")
+            
+            # 生成时间戳文件名
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"{data_dir}/positions_{timestamp}.json"
+            
+            # 保存数据
+            with open(filename, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            
+            self.logger.info(f"数据已保存到文件: {filename}")
+            return filename
+            
+        except Exception as e:
+            self.logger.error(f"保存数据到文件失败: {e}")
+            return ""
         
     def fetch_positions(self) -> Optional[Dict[str, Any]]:
         """
@@ -81,6 +113,9 @@ class PositionDataFetcher:
                 return None
             
             self.logger.info(f"成功获取持仓数据，包含 {len(converted_data.get('positions', []))} 个模型")
+            
+            # 保存到data目录，使用时间戳命名
+            self.save_data_to_file(data, "data")
             
             return converted_data
             

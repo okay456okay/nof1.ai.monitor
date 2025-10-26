@@ -196,6 +196,7 @@ python main.py --log-level DEBUG
 - 创建 [GitHub Issue](https://github.com/okay456okay/nof1.ai.monitor/issues)
 - X (Twitter): [@okay456okay](https://x.com/okay456okay)
 - 微信公众号：远见拾贝
+- 网站: [远见拾贝 - 用远见洞察，赚确定性的钱](https://www.insightpearl.com/)
 
 ![远见拾贝公众号二维码](images/InSightPearl21_qrcode.jpg)
 

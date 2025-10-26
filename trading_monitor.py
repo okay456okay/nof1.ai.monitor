@@ -76,6 +76,9 @@ class TradingMonitor:
                 return
             
             # 4. 分析持仓变化
+            self.logger.info(f"开始分析持仓变化，上次数据包含 {len(last_data.get('positions', []))} 个模型")
+            self.logger.info(f"当前数据包含 {len(current_data.get('positions', []))} 个模型")
+            
             trades = self.trade_analyzer.analyze_position_changes(
                 last_data, current_data, self.monitored_models
             )
@@ -84,15 +87,15 @@ class TradingMonitor:
             if trades:
                 self.logger.info(f"检测到 {len(trades)} 个交易变化，准备发送通知")
                 
+                # 打印交易摘要到日志
+                summary = self.trade_analyzer.generate_trade_summary(trades)
+                self.logger.info(f"交易详情:\n{summary}")
+                
                 # 发送通知
                 if self.notifier.send_trade_notification(trades):
                     self.logger.info("交易通知发送成功")
                 else:
                     self.logger.error("交易通知发送失败")
-                
-                # 打印交易摘要到日志
-                summary = self.trade_analyzer.generate_trade_summary(trades)
-                self.logger.info(f"交易摘要:\n{summary}")
             else:
                 self.logger.info("无交易变化")
             

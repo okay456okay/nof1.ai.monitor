@@ -34,13 +34,20 @@ class TradeAnalyzer:
             last_positions = last_data.get('positions', [])
             current_positions = current_data.get('positions', [])
             
+            self.logger.info(f"上次数据包含 {len(last_positions)} 个模型")
+            self.logger.info(f"当前数据包含 {len(current_positions)} 个模型")
+            
             # 创建模型字典便于查找
             last_models = {pos['id']: pos for pos in last_positions}
             current_models = {pos['id']: pos for pos in current_positions}
             
+            self.logger.debug(f"上次模型: {list(last_models.keys())}")
+            self.logger.debug(f"当前模型: {list(current_models.keys())}")
+            
             # 确定要检查的模型
             models_to_check = set(last_models.keys()) | set(current_models.keys())
             if monitored_models:
+                self.logger.info(f"监控模型列表: {monitored_models}")
                 models_to_check = models_to_check & set(monitored_models)
             
             self.logger.info(f"开始分析 {len(models_to_check)} 个模型的持仓变化")
