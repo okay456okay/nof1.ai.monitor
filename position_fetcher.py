@@ -5,7 +5,6 @@
 import json
 import logging
 import os
-from venv import logger
 
 import requests
 from typing import Dict, Any, Optional
