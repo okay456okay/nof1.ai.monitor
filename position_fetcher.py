@@ -5,6 +5,7 @@
 import json
 import logging
 import os
+from venv import logger
 
 import requests
 from typing import Dict, Any, Optional
@@ -25,7 +26,15 @@ class PositionDataFetcher:
         self.api_url = api_url
         self.save_history_data = save_history_data
         self.logger = logging.getLogger(__name__)
-    
+        self.models = self.get_models()
+
+    def get_models(self):
+        response = requests.get(f"{self.api_url}/leaderboard")
+        response.raise_for_status()
+        models = [m['id'] for m in response.json().get('leaderboard', [])]
+        self.logger.info(f"get leaderboard models: {models}")
+        return models
+
     def _calculate_last_hourly_marker(self) -> int:
         """
         计算lastHourlyMarker参数
@@ -97,7 +106,7 @@ class PositionDataFetcher:
             hourly_marker = self._calculate_last_hourly_marker()
             
             # 构建新的API URL
-            api_url = f"https://nof1.ai/api/account-totals?lastHourlyMarker={hourly_marker}"
+            api_url = f"{self.api_url}/account-totals?lastHourlyMarker={hourly_marker}"
             
             self.logger.info(f"正在获取持仓数据: {api_url}")
             
@@ -105,16 +114,29 @@ class PositionDataFetcher:
             response = requests.get(api_url, timeout=60)
             response.raise_for_status()  # 如果状态码不是200会抛出异常
             data = response.json()
+            data['accountTotals'] = [i for i in data.get("accountTotals", []) if i['model_id'] in self.models]
 
-            if len(data.get('accountTotals', [])) < 6:
-                self.logger.info(f"小时数据未获取到，获取全量数据")
-                response = requests.get('https://nof1.ai/api/account-totals', timeout=60)
+            if len(self.models) != len(data['accountTotals']):
+                self.logger.info(f"小时数据缺失部分模型数据, 获取全量数量")
+                response = requests.get(f'{self.api_url}/account-totals', timeout=60)
+                response.raise_for_status()
                 data = response.json()
                 try:
-                    data['accountTotals'] = data.get('accountTotals', [])[-7:]
+                    handled_models = []
+                    models_data = []
+                    all_positions = data.get("accountTotals", [])
+                    for i in range(-1, -1 - len(all_positions), -1):
+                        model = all_positions[i]['model_id']
+                        if model in self.models and model not in handled_models:
+                            handled_models.append(model)
+                            models_data.append(all_positions[i])
+                        if len(handled_models) == len(self.models):
+                            data['accountTotals'] = models_data
+                            break
                 except Exception as e:
                     self.logger.error(f"解析全量数据有问题： {e}，全量数据获取条数: {len(data['accountTotals'])}")
 
+            self.logger.info(f"all models id: {[i['id'] for i in data['accountTotals']]}")
             # 转换数据格式以保持向后兼容
             converted_data = self._convert_to_legacy_format(data)
             
@@ -133,7 +155,7 @@ class PositionDataFetcher:
                 self.logger.debug("未启用历史数据保存，跳过数据文件保存")
             
             return converted_data
-            
+
         except requests.exceptions.RequestException as e:
             self.logger.error(f"获取持仓数据失败: {e}")
             return None
@@ -143,7 +165,7 @@ class PositionDataFetcher:
         except Exception as e:
             self.logger.error(f"获取持仓数据时发生未知错误: {e}")
             return None
-    
+
     def _convert_to_legacy_format(self, new_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         将新的API数据格式转换为旧的格式以保持向后兼容

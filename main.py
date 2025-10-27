@@ -65,7 +65,7 @@ def load_config() -> dict:
         'webhook_url': os.getenv('WECHAT_WEBHOOK_URL'),
         'notification_type': os.getenv('NOTIFICATION_TYPE', 'wechat'),
         'monitored_models': os.getenv('MONITORED_MODELS', ''),
-        'api_url': os.getenv('API_URL', 'https://nof1.ai/api/account-totals'),
+        'api_url': os.getenv('API_URL', 'https://nof1.ai/api'),
         'log_level': os.getenv('LOG_LEVEL', 'INFO'),
         'save_history_data': os.getenv('SAVE_HISTORY_DATA', 'False').lower() == 'true'
     }
