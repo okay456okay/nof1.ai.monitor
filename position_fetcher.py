@@ -103,9 +103,16 @@ class PositionDataFetcher:
             # 发送GET请求获取数据
             response = requests.get(api_url, timeout=60)
             response.raise_for_status()  # 如果状态码不是200会抛出异常
-            
             data = response.json()
-            
+
+            if len(data.get('accountTotals', [])) == 0:
+                response = response.get('https://nof1.ai/api/account-totals', timeout=60)
+                data = response.json()
+                try:
+                    data['accountTotals'] = data.get('accountTotals', [])[-7:]
+                except IndexError:
+                    pass
+
             # 转换数据格式以保持向后兼容
             converted_data = self._convert_to_legacy_format(data)
             
