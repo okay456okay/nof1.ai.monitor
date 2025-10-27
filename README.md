@@ -6,6 +6,10 @@
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+## 重要提醒
+
+**由于nof1.ai网站接口变更以及数据对齐问题，之前的版本存在问题，请大家更新到最新版本(git pull)**
+
 ## ⚠️ 免责声明
 
 **本项目仅供学习和研究使用，不构成投资建议。**
