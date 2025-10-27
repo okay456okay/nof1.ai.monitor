@@ -150,7 +150,7 @@ class PositionDataFetcher:
             converted_positions = []
             
             for account in account_totals:
-                model_id = account.get('id', 'unknown')
+                model_id = account.get('model_id', 'unknown')
                 positions = account.get('positions', {})
                 
                 # 转换每个模型的持仓数据
