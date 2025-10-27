@@ -115,6 +115,9 @@ def main():
         logger.info(f"  监控模型: {config['monitored_models'] or '全部模型'}")
         logger.info(f"  日志级别: {config['log_level']}")
         logger.info(f"  保存历史数据: {config['save_history_data']}")
+
+        if config['api_url'].endswith('/account-totals'):
+            config['api_url'] = config['api_url'].replace('/account-totals', '')
         
         # 创建监控器
         monitor = TradingMonitor(
