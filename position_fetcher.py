@@ -5,6 +5,8 @@
 import json
 import logging
 import os
+from venv import logger
+
 import requests
 from typing import Dict, Any, Optional
 from datetime import datetime
@@ -106,12 +108,13 @@ class PositionDataFetcher:
             data = response.json()
 
             if len(data.get('accountTotals', [])) == 0:
+                self.logger.info(f"小时数据未获取到，获取全量数据")
                 response = response.get('https://nof1.ai/api/account-totals', timeout=60)
                 data = response.json()
                 try:
                     data['accountTotals'] = data.get('accountTotals', [])[-7:]
-                except IndexError:
-                    pass
+                except Exception as e:
+                    logger.error(f"解析全量数据有问题： {e}，全量数据获取条数: {len(data['accountTotals'])}")
 
             # 转换数据格式以保持向后兼容
             converted_data = self._convert_to_legacy_format(data)
