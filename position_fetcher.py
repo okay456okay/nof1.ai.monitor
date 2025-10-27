@@ -109,7 +109,7 @@ class PositionDataFetcher:
 
             if len(data.get('accountTotals', [])) == 0:
                 self.logger.info(f"小时数据未获取到，获取全量数据")
-                response = response.get('https://nof1.ai/api/account-totals', timeout=60)
+                response = requests.get('https://nof1.ai/api/account-totals', timeout=60)
                 data = response.json()
                 try:
                     data['accountTotals'] = data.get('accountTotals', [])[-7:]
