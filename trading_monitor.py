@@ -16,7 +16,8 @@ from wechat_notifier import WeChatNotifier
 class TradingMonitor:
     """交易监控器"""
     
-    def __init__(self, api_url: str, webhook_url: str, monitored_models: Optional[List[str]] = None):
+    def __init__(self, api_url: str, webhook_url: str, monitored_models: Optional[List[str]] = None, 
+                 save_history_data: bool = False):
         """
         初始化交易监控器
         
@@ -24,13 +25,14 @@ class TradingMonitor:
             api_url: API接口地址
             webhook_url: 企业微信机器人webhook地址
             monitored_models: 要监控的模型列表，None表示监控所有模型
+            save_history_data: 是否保存历史数据到data目录，默认为False
         """
         self.api_url = api_url
         self.webhook_url = webhook_url
         self.monitored_models = monitored_models
         
         # 初始化各个组件
-        self.position_fetcher = PositionDataFetcher(api_url)
+        self.position_fetcher = PositionDataFetcher(api_url, save_history_data)
         self.trade_analyzer = TradeAnalyzer()
         self.notifier = WeChatNotifier(webhook_url)
         

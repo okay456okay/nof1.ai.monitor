@@ -13,14 +13,16 @@ from datetime import datetime
 class PositionDataFetcher:
     """持仓数据获取器"""
     
-    def __init__(self, api_url: str):
+    def __init__(self, api_url: str, save_history_data: bool = False):
         """
         初始化持仓数据获取器
         
         Args:
             api_url: API接口地址
+            save_history_data: 是否保存历史数据到data目录，默认为False
         """
         self.api_url = api_url
+        self.save_history_data = save_history_data
         self.logger = logging.getLogger(__name__)
     
     def _calculate_last_hourly_marker(self) -> int:
@@ -114,8 +116,12 @@ class PositionDataFetcher:
             
             self.logger.info(f"成功获取持仓数据，包含 {len(converted_data.get('positions', []))} 个模型")
             
-            # 保存到data目录，使用时间戳命名
-            self.save_data_to_file(data, "data")
+            # 根据配置决定是否保存到data目录
+            if self.save_history_data:
+                self.logger.info("启用历史数据保存，保存数据到data目录")
+                self.save_data_to_file(data, "data")
+            else:
+                self.logger.debug("未启用历史数据保存，跳过数据文件保存")
             
             return converted_data
             

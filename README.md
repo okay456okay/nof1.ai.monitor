@@ -74,6 +74,9 @@ API_URL=https://nof1.ai/api/account-totals
 
 # 日志级别
 LOG_LEVEL=INFO
+
+# 是否保存历史数据到data目录（可选）
+SAVE_HISTORY_DATA=False
 ```
 
 ### 3. 获取企业微信机器人Webhook
@@ -114,7 +117,7 @@ python main.py --config /path/to/.env
 ## 监控逻辑
 
 1. **数据获取**: 每分钟从API获取当前持仓数据
-2. **数据保存**: 将当前数据保存为 `current.json`
+2. **数据保存**: 将当前数据保存为 `current.json`，并根据配置决定是否保存到 `data/` 目录
 3. **变化检测**: 与上次数据 `last.json` 进行比较
 4. **交易分析**: 识别以下交易行为：
    - 新开仓（买入/卖出）
@@ -135,6 +138,23 @@ python main.py --config /path/to/.env
 - 🤖 按模型分组的交易详情
 - 📈📉 交易类型图标
 
+
+通知示例: 
+```
+🚨 AI交易监控提醒
+⏰ 时间: 2025-10-27 13:21:32
+📊 检测到 1 个交易变化:
+🤖 qwen3-max
+  🔴 qwen3-max ETH 已平仓 (买多 12.14, 杠杆: 10x, 进入: 4153.2, 当前: 4235.35)
+
+
+🚨 AI交易监控提醒
+⏰ 时间: 2025-10-27 13:23:18
+📊 检测到 1 个交易变化:
+🤖 qwen3-max
+  🟢 qwen3-max ETH 新开仓: 买多 25.15 (杠杆: 25x, 进入: 4246.35, 当前: 4247.05)
+```
+
 ## 日志文件
 
 系统会在 `logs/` 目录下生成日志文件：
@@ -145,7 +165,8 @@ python main.py --config /path/to/.env
 1. **首次运行**: 第一次运行时会跳过比较，因为不存在历史数据
 2. **网络连接**: 确保服务器能够访问API和企业微信接口
 3. **权限配置**: 确保企业微信机器人有发送消息的权限
-4. **数据安全**: 持仓数据会保存在本地JSON文件中，请注意数据安全
+4. **数据保存**: 系统默认不保存历史数据到`data/`目录，如需保存历史数据请设置 `SAVE_HISTORY_DATA=True`
+5. **数据安全**: `current.json` 和 `last.json` 会保存在本地，请注意数据安全
 
 ## 故障排除
 
@@ -198,7 +219,7 @@ python main.py --log-level DEBUG
 - 微信公众号：远见拾贝
 - 网站: [远见拾贝 - 用远见洞察，赚确定性的钱](https://www.insightpearl.com/)
 
-![远见拾贝公众号二维码](images/InSightPearl21_qrcode.jpg)
+<img src="images/InSightPearl21_qrcode.jpg" alt="远见拾贝公众号二维码" width="150" height="150">
 
 ---
 

@@ -66,7 +66,8 @@ def load_config() -> dict:
         'notification_type': os.getenv('NOTIFICATION_TYPE', 'wechat'),
         'monitored_models': os.getenv('MONITORED_MODELS', ''),
         'api_url': os.getenv('API_URL', 'https://nof1.ai/api/account-totals'),
-        'log_level': os.getenv('LOG_LEVEL', 'INFO')
+        'log_level': os.getenv('LOG_LEVEL', 'INFO'),
+        'save_history_data': os.getenv('SAVE_HISTORY_DATA', 'False').lower() == 'true'
     }
     
     # 验证必需配置
@@ -113,12 +114,14 @@ def main():
         logger.info(f"  通知类型: {config['notification_type']}")
         logger.info(f"  监控模型: {config['monitored_models'] or '全部模型'}")
         logger.info(f"  日志级别: {config['log_level']}")
+        logger.info(f"  保存历史数据: {config['save_history_data']}")
         
         # 创建监控器
         monitor = TradingMonitor(
             api_url=config['api_url'],
             webhook_url=config['webhook_url'],
-            monitored_models=config['monitored_models']
+            monitored_models=config['monitored_models'],
+            save_history_data=config['save_history_data']
         )
         
         # 测试模式
