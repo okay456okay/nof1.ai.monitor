@@ -29,14 +29,18 @@
 🚨 AI交易监控提醒
 ⏰ 时间: 2025-10-27 13:21:32
 📊 检测到 1 个交易变化:
-🤖 qwen3-max
+
+🤖 qwen3-max [查看持仓](https://nof1.ai/models/qwen3-max)
   🔴 qwen3-max ETH 已平仓 (买多 12.14, 杠杆: 10x, 进入: 4153.2, 当前: 4235.35)
+
+
 
 
 🚨 AI交易监控提醒
 ⏰ 时间: 2025-10-27 13:23:18
 📊 检测到 1 个交易变化:
-🤖 qwen3-max
+
+🤖 qwen3-max [查看持仓](https://nof1.ai/models/qwen3-max)
   🟢 qwen3-max ETH 新开仓: 买多 25.15 (杠杆: 25x, 进入: 4246.35, 当前: 4247.05)
 ```
 
@@ -163,6 +167,8 @@ python main.py --config /path/to/.env
 
 🤖 qwen3-max [查看持仓](https://nof1.ai/models/qwen3-max)
   🔴 qwen3-max ETH 已平仓 (买多 12.14, 杠杆: 10x, 进入: 4153.2, 当前: 4235.35)
+
+
 
 
 🚨 AI交易监控提醒
