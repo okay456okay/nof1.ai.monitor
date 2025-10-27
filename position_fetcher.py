@@ -114,7 +114,7 @@ class PositionDataFetcher:
                 try:
                     data['accountTotals'] = data.get('accountTotals', [])[-7:]
                 except Exception as e:
-                    logger.error(f"解析全量数据有问题： {e}，全量数据获取条数: {len(data['accountTotals'])}")
+                    self.logger.error(f"解析全量数据有问题： {e}，全量数据获取条数: {len(data['accountTotals'])}")
 
             # 转换数据格式以保持向后兼容
             converted_data = self._convert_to_legacy_format(data)
