@@ -106,7 +106,7 @@ class PositionDataFetcher:
             response.raise_for_status()  # 如果状态码不是200会抛出异常
             data = response.json()
 
-            if len(data.get('accountTotals', [])) == 0:
+            if len(data.get('accountTotals', [])) < 6:
                 self.logger.info(f"小时数据未获取到，获取全量数据")
                 response = requests.get('https://nof1.ai/api/account-totals', timeout=60)
                 data = response.json()
@@ -160,7 +160,7 @@ class PositionDataFetcher:
             # 检查是否为空数据
             if not account_totals:
                 self.logger.warning("API返回空数据，跳过本次检测")
-                return None
+                return {}
             
             converted_positions = []
             
