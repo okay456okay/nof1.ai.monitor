@@ -151,7 +151,7 @@ python main.py --config /path/to/.env
 - 🚨 交易提醒标题
 - ⏰ 检测时间
 - 📊 变化数量统计
-- 🤖 按模型分组的交易详情
+- 🤖 按模型分组的交易详情（包含模型持仓链接）
 - 📈📉 交易类型图标
 
 
@@ -160,14 +160,16 @@ python main.py --config /path/to/.env
 🚨 AI交易监控提醒
 ⏰ 时间: 2025-10-27 13:21:32
 📊 检测到 1 个交易变化:
-🤖 qwen3-max
+
+🤖 qwen3-max [查看持仓](https://nof1.ai/models/qwen3-max)
   🔴 qwen3-max ETH 已平仓 (买多 12.14, 杠杆: 10x, 进入: 4153.2, 当前: 4235.35)
 
 
 🚨 AI交易监控提醒
 ⏰ 时间: 2025-10-27 13:23:18
 📊 检测到 1 个交易变化:
-🤖 qwen3-max
+
+🤖 qwen3-max [查看持仓](https://nof1.ai/models/qwen3-max)
   🟢 qwen3-max ETH 新开仓: 买多 25.15 (杠杆: 25x, 进入: 4246.35, 当前: 4247.05)
 ```
 

@@ -22,6 +22,18 @@ class WeChatNotifier:
         self.webhook_url = webhook_url
         self.logger = logging.getLogger(__name__)
     
+    def _get_model_link(self, model_id: str) -> str:
+        """
+        获取模型持仓页面链接
+        
+        Args:
+            model_id: 模型ID
+            
+        Returns:
+            模型持仓页面链接
+        """
+        return f"https://nof1.ai/models/{model_id}"
+    
     def send_trade_notification(self, trades: List[Dict[str, Any]]) -> bool:
         """
         发送交易通知
@@ -82,7 +94,8 @@ class WeChatNotifier:
         
         # 生成每个模型的交易信息
         for model_id, model_trades in trades_by_model.items():
-            content_lines.append(f"**🤖 {model_id}**")
+            model_link = self._get_model_link(model_id)
+            content_lines.append(f"🤖 **{model_id}** [查看持仓]({model_link})")
             
             for trade in model_trades:
                 trade_type = trade.get('type', 'unknown')
