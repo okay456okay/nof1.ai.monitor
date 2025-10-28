@@ -1,5 +1,7 @@
 # nof1.ai Alpha Arena AI大模型交易监控系统
 
+中文 | [English](README.en.md)
+
 监控[AI trading in real markets](https://nof1.ai/) Alpha Arena AI大模型加密货币交易行为的通知系统，当检测到交易变化时会通过企业微信群机器人发送通知。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -23,7 +25,8 @@
 
 - 🔄 **定时监控**: 每分钟自动获取Alpha Arena持仓数据
 - 📊 **变化检测**: 智能分析持仓变化，识别交易行为
-- 📱 **实时通知**: 通过企业微信群机器人发送交易提醒
+- 📱 **实时通知**: 通过企业微信群机器人、Telegram 发送交易提醒（可选多通道）
+- 🌐 **持仓表格页面**: 内置 Flask 页面展示各模型持仓，支持中英文切换，15秒自动刷新
 - 🎯 **精准监控**: 支持指定特定模型进行监控
 - 📝 **详细日志**: 完整的操作日志记录
 - ⚙️ **灵活配置**: 通过环境变量进行配置管理
@@ -83,11 +86,14 @@ cp env.example .env
 编辑 `.env` 文件，配置以下参数：
 
 ```env
-# 企业微信机器人webhook地址（必需）
+# 企业微信机器人webhook地址（可选，如配置则启用企业微信通知）
 WECHAT_WEBHOOK_URL=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=YOUR_WEBHOOK_KEY
 
-# 通知类型（目前只支持wechat）
-NOTIFICATION_TYPE=wechat
+# Telegram 机器人设置（可选，如配置则启用）
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
+# Telegram 代理，默认为 127.0.0.1:7890
+TELEGRAM_PROXY=127.0.0.1:7890
 
 # 关注的模型列表，多个用逗号分隔，为空则监控所有模型
 # 例如：deepseek-chat-v3.1,claude-sonnet-4-5
@@ -119,6 +125,20 @@ source venv/bin/activate
 
 # 启动监控系统
 python main.py
+```
+
+### 启动持仓表格页面（Flask）
+
+```bash
+# 激活虚拟环境
+source venv/bin/activate
+
+# 运行Web页面（默认端口5010）
+python web.py
+
+# 浏览器访问
+# 中文默认：http://127.0.0.1:5010/
+# 英文版本：http://127.0.0.1:5010/?lang=en （页面内可点击切换按钮）
 ```
 
 ### 测试通知功能

@@ -81,6 +81,7 @@ class WeChatNotifier:
             "🚨 **AI交易监控提醒**",
             f"⏰ 时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
             f"📊 检测到 {len(trades)} 个交易变化:",
+            "🔗 [全部持仓](http://alpha.insightpearl.com/)",
             ""
         ]
         

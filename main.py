@@ -62,20 +62,19 @@ def load_config() -> dict:
     
     # 获取配置
     config = {
-        'webhook_url': os.getenv('WECHAT_WEBHOOK_URL'),
-        'notification_type': os.getenv('NOTIFICATION_TYPE', 'wechat'),
+        'wechat_webhook_url': os.getenv('WECHAT_WEBHOOK_URL'),
+        'telegram_bot_token': os.getenv('TELEGRAM_BOT_TOKEN'),
+        'telegram_chat_id': os.getenv('TELEGRAM_CHAT_ID'),
+        'telegram_proxy': os.getenv('TELEGRAM_PROXY', '127.0.0.1:7890'),
         'monitored_models': os.getenv('MONITORED_MODELS', ''),
         'api_url': os.getenv('API_URL', 'https://nof1.ai/api'),
         'log_level': os.getenv('LOG_LEVEL', 'INFO'),
         'save_history_data': os.getenv('SAVE_HISTORY_DATA', 'False').lower() == 'true'
     }
     
-    # 验证必需配置
-    if not config['webhook_url']:
-        raise ValueError("WECHAT_WEBHOOK_URL 配置项不能为空")
-    
-    if not config['webhook_url'].startswith('https://qyapi.weixin.qq.com'):
-        raise ValueError("WECHAT_WEBHOOK_URL 必须是有效的企业微信机器人webhook地址")
+    # 至少需要配置一个通知渠道（企业微信或Telegram）
+    if not config['wechat_webhook_url'] and not (config['telegram_bot_token'] and config['telegram_chat_id']):
+        print("警告: 未配置任何通知渠道，系统将只拉取与分析数据，不发送通知。")
     
     # 处理监控模型列表
     if config['monitored_models']:
@@ -111,7 +110,10 @@ def main():
         
         logger.info(f"配置加载完成:")
         logger.info(f"  API地址: {config['api_url']}")
-        logger.info(f"  通知类型: {config['notification_type']}")
+        logger.info("  通知渠道: {}{}".format(
+            'WeChat ' if config['wechat_webhook_url'] else '',
+            'Telegram' if (config['telegram_bot_token'] and config['telegram_chat_id']) else ''
+        ))
         logger.info(f"  监控模型: {config['monitored_models'] or '全部模型'}")
         logger.info(f"  日志级别: {config['log_level']}")
         logger.info(f"  保存历史数据: {config['save_history_data']}")
@@ -122,7 +124,10 @@ def main():
         # 创建监控器
         monitor = TradingMonitor(
             api_url=config['api_url'],
-            webhook_url=config['webhook_url'],
+            wechat_webhook_url=config['wechat_webhook_url'],
+            telegram_bot_token=config['telegram_bot_token'],
+            telegram_chat_id=config['telegram_chat_id'],
+            telegram_proxy=config['telegram_proxy'],
             monitored_models=config['monitored_models'],
             save_history_data=config['save_history_data']
         )

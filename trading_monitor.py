@@ -13,11 +13,51 @@ from trade_analyzer import TradeAnalyzer
 from wechat_notifier import WeChatNotifier
 
 
+class TelegramNotifier:
+    """Telegram 通知器"""
+
+    def __init__(self, bot_token: str, chat_id: str, proxy: str | None = None):
+        self.bot_token = bot_token
+        self.chat_id = chat_id
+        self.proxy = proxy
+        self.logger = logging.getLogger(__name__)
+
+    def _send_text(self, text: str) -> bool:
+        try:
+            import requests
+
+            url = f"https://api.telegram.org/bot{self.bot_token}/sendMessage"
+            proxies = None
+            if self.proxy:
+                host, port = self.proxy.split(":") if ":" in self.proxy else (self.proxy, "7890")
+                proxies = {
+                    "http": f"http://{host}:{port}",
+                    "https": f"http://{host}:{port}",
+                }
+            resp = requests.post(url, json={"chat_id": self.chat_id, "text": text, "parse_mode": "Markdown"}, timeout=15, proxies=proxies)
+            resp.raise_for_status()
+            data = resp.json()
+            if not data.get("ok"):
+                self.logger.error(f"Telegram 发送失败: {data}")
+                return False
+            return True
+        except Exception as e:
+            self.logger.error(f"Telegram 发送消息错误: {e}")
+            return False
+
+    def send_trade_notification(self, content: str) -> bool:
+        return self._send_text(content)
+
+    def send_plain(self, text: str) -> bool:
+        return self._send_text(text)
+
+
 class TradingMonitor:
     """交易监控器"""
     
-    def __init__(self, api_url: str, webhook_url: str, monitored_models: Optional[List[str]] = None, 
-                 save_history_data: bool = False):
+    def __init__(self, api_url: str, wechat_webhook_url: Optional[str] = None, telegram_bot_token: Optional[str] = None,
+                 telegram_chat_id: Optional[str] = None, telegram_proxy: Optional[str] = None,
+                 monitored_models: Optional[List[str]] = None, save_history_data: bool = False):
         """
         初始化交易监控器
         
@@ -28,13 +68,16 @@ class TradingMonitor:
             save_history_data: 是否保存历史数据到data目录，默认为False
         """
         self.api_url = api_url
-        self.webhook_url = webhook_url
+        self.wechat_webhook_url = wechat_webhook_url
         self.monitored_models = monitored_models
         
         # 初始化各个组件
         self.position_fetcher = PositionDataFetcher(api_url, save_history_data)
         self.trade_analyzer = TradeAnalyzer()
-        self.notifier = WeChatNotifier(webhook_url)
+        self.wechat_notifier = WeChatNotifier(wechat_webhook_url) if wechat_webhook_url else None
+        self.telegram_notifier = None
+        if telegram_bot_token and telegram_chat_id:
+            self.telegram_notifier = TelegramNotifier(telegram_bot_token, telegram_chat_id, telegram_proxy)
         
         # 设置日志
         self.logger = logging.getLogger(__name__)
@@ -93,11 +136,26 @@ class TradingMonitor:
                 summary = self.trade_analyzer.generate_trade_summary(trades)
                 self.logger.info(f"交易详情:\n{summary}")
                 
-                # 发送通知
-                if self.notifier.send_trade_notification(trades):
-                    self.logger.info("交易通知发送成功")
+                # 发送通知（各渠道按配置发送）
+                sent_any = False
+                content = self.trade_analyzer.generate_trade_summary(trades)
+                content = content + "\n\n🔗 全部持仓: http://alpha.insightpearl.com/"
+                if self.wechat_notifier:
+                    try:
+                        if self.wechat_notifier.send_trade_notification(trades):
+                            sent_any = True
+                    except Exception:
+                        self.logger.error("企业微信通知发送失败")
+                if self.telegram_notifier:
+                    try:
+                        if self.telegram_notifier.send_trade_notification(content):
+                            sent_any = True
+                    except Exception:
+                        self.logger.error("Telegram 通知发送失败")
+                if sent_any:
+                    self.logger.info("交易通知发送完成（至少一个渠道成功）")
                 else:
-                    self.logger.error("交易通知发送失败")
+                    self.logger.warning("未配置通知渠道或所有渠道发送失败")
             else:
                 self.logger.info("无交易变化")
             
@@ -125,28 +183,13 @@ class TradingMonitor:
                 f"👀 监控模型: {', '.join(self.monitored_models) if self.monitored_models else '全部模型'}\n\n"
                 "✅ 系统已开始监控，将每分钟检查一次持仓变化"
             )
-            
-            # 构建消息数据
-            message_data = {
-                "msgtype": "markdown",
-                "markdown": {
-                    "content": startup_message
-                }
-            }
-            
-            import requests
-            response = requests.post(
-                self.webhook_url,
-                json=message_data,
-                headers={'Content-Type': 'application/json'},
-                timeout=10
-            )
-            
-            if response.status_code == 200:
-                self.logger.info("启动通知发送成功")
-            else:
-                self.logger.warning("启动通知发送失败")
-                
+            if self.wechat_notifier:
+                import requests
+                message_data = {"msgtype": "markdown", "markdown": {"content": startup_message}}
+                requests.post(self.wechat_webhook_url, json=message_data, headers={'Content-Type': 'application/json'}, timeout=10)
+            if self.telegram_notifier:
+                self.telegram_notifier.send_plain(startup_message)
+            self.logger.info("启动通知发送完成（按配置渠道）")
         except Exception as e:
             self.logger.warning(f"发送启动通知时发生错误: {e}")
         
@@ -172,22 +215,13 @@ class TradingMonitor:
                 "系统已安全关闭"
             )
             
-            message_data = {
-                "msgtype": "markdown",
-                "markdown": {
-                    "content": shutdown_message
-                }
-            }
-            
-            import requests
-            requests.post(
-                self.webhook_url,
-                json=message_data,
-                headers={'Content-Type': 'application/json'},
-                timeout=10
-            )
-            
-            self.logger.info("关闭通知发送成功")
+            if self.wechat_notifier:
+                import requests
+                message_data = {"msgtype": "markdown", "markdown": {"content": shutdown_message}}
+                requests.post(self.wechat_webhook_url, json=message_data, headers={'Content-Type': 'application/json'}, timeout=10)
+            if self.telegram_notifier:
+                self.telegram_notifier.send_plain(shutdown_message)
+            self.logger.info("关闭通知发送完成（按配置渠道）")
             
         except Exception as e:
             self.logger.warning(f"发送关闭通知时发生错误: {e}")
@@ -202,22 +236,13 @@ class TradingMonitor:
                 "请检查系统状态"
             )
             
-            message_data = {
-                "msgtype": "markdown",
-                "markdown": {
-                    "content": error_notification
-                }
-            }
-            
-            import requests
-            requests.post(
-                self.webhook_url,
-                json=message_data,
-                headers={'Content-Type': 'application/json'},
-                timeout=10
-            )
-            
-            self.logger.info("错误通知发送成功")
+            if self.wechat_notifier:
+                import requests
+                message_data = {"msgtype": "markdown", "markdown": {"content": error_notification}}
+                requests.post(self.wechat_webhook_url, json=message_data, headers={'Content-Type': 'application/json'}, timeout=10)
+            if self.telegram_notifier:
+                self.telegram_notifier.send_plain(error_notification)
+            self.logger.info("错误通知发送完成（按配置渠道）")
             
         except Exception as e:
             self.logger.error(f"发送错误通知时发生错误: {e}")
@@ -225,4 +250,9 @@ class TradingMonitor:
     def test_notification(self):
         """测试通知功能"""
         self.logger.info("测试通知功能")
-        return self.notifier.send_test_message()
+        ok = True
+        if self.wechat_notifier:
+            ok = ok and self.wechat_notifier.send_test_message()
+        if self.telegram_notifier:
+            ok = ok and self.telegram_notifier.send_plain("🧪 AI交易监控系统测试\n\n✅ Telegram 通道正常")
+        return ok
