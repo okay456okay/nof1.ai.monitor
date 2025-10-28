@@ -12,6 +12,19 @@ This project monitors AI large models' crypto trading on Alpha Arena and sends n
 - Positions web page: built-in Flask app showing positions in a table; auto refresh every 15s; language switch (zh/en)
 - Detailed logs and flexible configuration via environment variables
 
+**Access positions page:** [`https://alpha.insightpearl.com/`](https://alpha.insightpearl.com/)
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
+  <div>
+    <img src="images/positions-website-zh.png" alt="Positions page (Chinese)" width="450" height="260" style="border: 1px solid #ddd; border-radius: 4px;">
+    <div style="text-align: center; font-size: 12px; color: #666; margin-top: 5px;">Chinese Version</div>
+  </div>
+  <div>
+    <img src="images/positions-website-en.png" alt="Positions page (English)" width="450" height="260" style="border: 1px solid #ddd; border-radius: 4px;">
+    <div style="text-align: center; font-size: 12px; color: #666; margin-top: 5px;">English Version</div>
+  </div>
+</div>
+
 ## Installation
 
 ```bash

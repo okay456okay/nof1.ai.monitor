@@ -31,6 +31,19 @@
 - 📝 **详细日志**: 完整的操作日志记录
 - ⚙️ **灵活配置**: 通过环境变量进行配置管理
 
+**持仓页面在线访问：** [`https://alpha.insightpearl.com/`](https://alpha.insightpearl.com/)
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 15px;">
+  <div>
+    <img src="images/positions-website-zh.png" alt="持仓页面示例（中文）" width="450" height="260" style="border: 1px solid #ddd; border-radius: 4px;">
+    <div style="text-align: center; font-size: 12px; color: #666; margin-top: 5px;">中文版本</div>
+  </div>
+  <div>
+    <img src="images/positions-website-en.png" alt="Positions Page Example (EN)" width="450" height="260" style="border: 1px solid #ddd; border-radius: 4px;">
+    <div style="text-align: center; font-size: 12px; color: #666; margin-top: 5px;">English Version</div>
+  </div>
+</div>
+
 **通知示例:** 
 ```
 🚨 AI交易监控提醒
