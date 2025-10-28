@@ -158,6 +158,9 @@ class TradeAnalyzer:
                 else:
                     direction = "卖空"
                 
+                exit_plan = current_pos.get('exit_plan', {})
+                tp = exit_plan.get('profit_target', 'N/A')
+                sl = exit_plan.get('stop_loss', 'N/A')
                 trades.append({
                     'type': 'position_opened',
                     'model_id': model_id,
@@ -167,7 +170,9 @@ class TradeAnalyzer:
                     'leverage': leverage,
                     'entry_price': entry_price,
                     'current_price': current_price,
-                    'message': f"{model_id} {symbol} 新开仓: {direction} {abs(quantity)} (杠杆: {leverage}x, 进入: {entry_price}, 当前: {current_price})",
+                    'tp': tp,
+                    'sl': sl,
+                    'message': f"{model_id} {symbol} 新开仓: {direction} {abs(quantity)} (杠杆: {leverage}x, 进入: {entry_price}, 当前: {current_price}, 止盈: {tp}, 止损: {sl})",
                     'timestamp': datetime.now().isoformat()
                 })
                 return trades
@@ -185,6 +190,9 @@ class TradeAnalyzer:
                 else:
                     direction = "卖空"
                 
+                exit_plan = last_pos.get('exit_plan', {})
+                tp = exit_plan.get('profit_target', 'N/A')
+                sl = exit_plan.get('stop_loss', 'N/A')
                 trades.append({
                     'type': 'position_closed',
                     'model_id': model_id,
@@ -194,7 +202,9 @@ class TradeAnalyzer:
                     'last_entry_price': last_entry_price,
                     'last_current_price': last_current_price,
                     'direction': direction,
-                    'message': f"{model_id} {symbol} 已平仓 ({direction} {abs(last_quantity)}, 杠杆: {last_leverage}x, 进入: {last_entry_price}, 当前: {last_current_price})",
+                    'tp': tp,
+                    'sl': sl,
+                    'message': f"{model_id} {symbol} 已平仓 ({direction} {abs(last_quantity)}, 杠杆: {last_leverage}x, 进入: {last_entry_price}, 当前: {last_current_price}, 止盈: {tp}, 止损: {sl})",
                     'timestamp': datetime.now().isoformat()
                 })
                 return trades
@@ -235,6 +245,9 @@ class TradeAnalyzer:
                     else:
                         action = "调整卖空杠杆"
                 
+                exit_plan = current_pos.get('exit_plan', {})
+                tp = exit_plan.get('profit_target', 'N/A')
+                sl = exit_plan.get('stop_loss', 'N/A')
                 trades.append({
                     'type': 'position_changed',
                     'model_id': model_id,
@@ -248,10 +261,12 @@ class TradeAnalyzer:
                     'last_entry_price': last_entry_price,
                     'current_entry_price': current_entry_price,
                     'current_price': current_price,
+                    'tp': tp,
+                    'sl': sl,
                     'message': self._format_trade_message(model_id, symbol, action, 
                                                         abs(quantity_change), last_quantity, current_quantity,
                                                         last_leverage, current_leverage, 
-                                                        last_entry_price, current_entry_price, current_price),
+                                                        last_entry_price, current_entry_price, current_price, tp, sl),
                     'timestamp': datetime.now().isoformat()
                 })
             
@@ -264,7 +279,7 @@ class TradeAnalyzer:
     def _format_trade_message(self, model_id: str, symbol: str, action: str, 
                             quantity_change: float, last_quantity: float, current_quantity: float,
                             last_leverage: int, current_leverage: int, 
-                            last_entry_price: float, current_entry_price: float, current_price: float) -> str:
+                            last_entry_price: float, current_entry_price: float, current_price: float, tp='N/A', sl='N/A') -> str:
         """
         格式化交易消息
         
@@ -280,14 +295,16 @@ class TradeAnalyzer:
             last_entry_price: 原进入价格
             current_entry_price: 现进入价格
             current_price: 当前价格
+            tp: 止盈价格
+            sl: 止损价格
             
         Returns:
             格式化的交易消息
         """
         if "调整" in action:
-            return f"{model_id} {symbol} {action}: {last_leverage}x → {current_leverage}x (仓位: {current_quantity}, 进入: {current_entry_price}, 当前: {current_price})"
+            return f"{model_id} {symbol} {action}: {last_leverage}x → {current_leverage}x (仓位: {current_quantity}, 进入: {current_entry_price}, 当前: {current_price}, 止盈: {tp}, 止损: {sl})"
         else:
-            return f"{model_id} {symbol} {action} {quantity_change}: {last_quantity} → {current_quantity} (杠杆: {last_leverage}x → {current_leverage}x, 进入: {last_entry_price} → {current_entry_price}, 当前: {current_price})"
+            return f"{model_id} {symbol} {action} {quantity_change}: {last_quantity} → {current_quantity} (杠杆: {last_leverage}x → {current_leverage}x, 进入: {last_entry_price} → {current_entry_price}, 当前: {current_price}, 止盈: {tp}, 止损: {sl})"
     
     def generate_trade_summary(self, trades: List[Dict[str, Any]]) -> str:
         """
