@@ -34,21 +34,11 @@
 **通知示例:** 
 ```
 🚨 AI交易监控提醒
-⏰ 时间: 2025-10-27 13:21:32
+⏰ 时间: 2025-10-28 22:30:56
 📊 检测到 1 个交易变化:
-
-🤖 qwen3-max [查看持仓](https://nof1.ai/models/qwen3-max)
-  🔴 qwen3-max ETH 已平仓 (买多 12.14, 杠杆: 10x, 进入: 4153.2, 当前: 4235.35)
-
-
-
-
-🚨 AI交易监控提醒
-⏰ 时间: 2025-10-27 13:23:18
-📊 检测到 1 个交易变化:
-
-🤖 qwen3-max [查看持仓](https://nof1.ai/models/qwen3-max)
-  🟢 qwen3-max ETH 新开仓: 买多 25.15 (杠杆: 25x, 进入: 4246.35, 当前: 4247.05)
+🔗 全部持仓
+🤖 deepseek-chat-v3.1 查看持仓
+  ⚙️ deepseek-chat-v3.1 XRP 加仓买多 3000: 609 → 3609 (杠杆: 10x → 10x, 进入: 2.4448 → 2.4448, 当前: 2.65365, 止盈: 2.815, 止损: 2.325)
 ```
 
 ## 系统架构
@@ -141,6 +131,18 @@ python web.py
 # 英文版本：http://127.0.0.1:5010/?lang=en （页面内可点击切换按钮）
 ```
 
+#### 持仓页面示例与链接
+
+- 在线页面链接：[`https://alpha.insightpearl.com/`](https://alpha.insightpearl.com/)
+
+- 中文示例截图：
+
+<img src="images/positions-website-zh.png" alt="持仓页面示例（中文）" width="900" height="520">
+
+- 英文示例截图：
+
+<img src="images/positions-website-en.png" alt="Positions Page Example (EN)" width="900" height="520">
+
 ### 测试通知功能
 
 ```bash
@@ -186,21 +188,11 @@ python main.py --config /path/to/.env
 通知示例: 
 ```
 🚨 AI交易监控提醒
-⏰ 时间: 2025-10-27 13:21:32
+⏰ 时间: 2025-10-28 22:30:56
 📊 检测到 1 个交易变化:
-
-🤖 qwen3-max [查看持仓](https://nof1.ai/models/qwen3-max)
-  🔴 qwen3-max ETH 已平仓 (买多 12.14, 杠杆: 10x, 进入: 4153.2, 当前: 4235.35)
-
-
-
-
-🚨 AI交易监控提醒
-⏰ 时间: 2025-10-27 13:23:18
-📊 检测到 1 个交易变化:
-
-🤖 qwen3-max [查看持仓](https://nof1.ai/models/qwen3-max)
-  🟢 qwen3-max ETH 新开仓: 买多 25.15 (杠杆: 25x, 进入: 4246.35, 当前: 4247.05)
+🔗 全部持仓
+🤖 deepseek-chat-v3.1 查看持仓
+  ⚙️ deepseek-chat-v3.1 XRP 加仓买多 3000: 609 → 3609 (杠杆: 10x → 10x, 进入: 2.4448 → 2.4448, 当前: 2.65365, 止盈: 2.815, 止损: 2.325)
 ```
 
 ## 日志文件

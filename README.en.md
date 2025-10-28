@@ -62,6 +62,18 @@ python web.py  # default port 5010
 # en: http://127.0.0.1:5010/?lang=en (toggle on page)
 ```
 
+#### Positions page samples and link
+
+- Online page: [`https://alpha.insightpearl.com/`](https://alpha.insightpearl.com/)
+
+- Chinese sample screenshot:
+
+<img src="images/positions-website-zh.png" alt="Positions page (Chinese)" width="900" height="520">
+
+- English sample screenshot:
+
+<img src="images/positions-website-en.png" alt="Positions page (English)" width="900" height="520">
+
 ### Test notification
 
 ```bash
