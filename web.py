@@ -117,7 +117,7 @@ def index():
   </div>
 
   {% for m in models %}
-    <div class="model">{{ t['model'] }}：<strong>{{ m.get('id') }}</strong> &nbsp; {{ t['rpnl'] }}：{{ '%.2f' % (m.get('realized_pnl', 0.0) or 0.0) }}</div>
+    <div class="model">{{ t['model'] }}：<strong><a href="https://nof1.ai/models/{{ m.get('id') }}" target="_blank" rel="noopener">{{ m.get('id') }}</a></strong> &nbsp; {{ t['rpnl'] }}：{{ '%.2f' % (m.get('realized_pnl', 0.0) or 0.0) }}</div>
     <table>
       <thead>
         <tr>
