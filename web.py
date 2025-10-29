@@ -27,6 +27,17 @@ def index():
     data = load_last_json()
     # Expect data['positions'] to be a list of model snapshots
     models = data.get('positions', [])
+    
+    # Calculate unrealized and total PnL for each model
+    for m in models:
+        realized_pnl = m.get('realized_pnl', 0.0) or 0.0
+        unrealized_pnl = 0.0
+        positions = m.get('positions', {})
+        for pos in positions.values():
+            unrealized_pnl += (pos.get('unrealized_pnl', 0.0) or 0.0)
+        m['unrealized_pnl'] = unrealized_pnl
+        m['total_pnl'] = realized_pnl + unrealized_pnl
+    
     # Sort by realized_pnl descending
     models = sorted(models, key=lambda m: (m.get('realized_pnl') or 0.0), reverse=True)
 
@@ -46,7 +57,9 @@ def index():
         'auto_refresh': '自动每15秒刷新' if not is_en else 'Auto refresh every 15s',
         'delay': '提示：与官网数据存在约1分钟延时' if not is_en else 'Note: ~1 minute delay vs. official site',
         'model': '模型' if not is_en else 'Model',
-        'rpnl': '实现盈亏' if not is_en else 'Realized PnL',
+        'rpnl': '已实现盈亏' if not is_en else 'Realized PnL',
+        'urpnl': '未实现盈亏' if not is_en else 'Unrealized PnL',
+        'tpnl': '总盈亏' if not is_en else 'Total PnL',
         'pair': '合约对' if not is_en else 'Pair',
         'qty': '数量' if not is_en else 'Qty',
         'lev': '杠杆' if not is_en else 'Lev',
@@ -117,7 +130,7 @@ def index():
   </div>
 
   {% for m in models %}
-    <div class="model">{{ t['model'] }}：<strong><a href="https://nof1.ai/models/{{ m.get('id') }}" target="_blank" rel="noopener">{{ m.get('id') }}</a></strong> &nbsp; {{ t['rpnl'] }}：{{ '%.2f' % (m.get('realized_pnl', 0.0) or 0.0) }}</div>
+    <div class="model">{{ t['model'] }}：<strong><a href="https://nof1.ai/models/{{ m.get('id') }}" target="_blank" rel="noopener">{{ m.get('id') }}</a></strong> &nbsp; {{ t['rpnl'] }}：{{ '%.2f' % (m.get('realized_pnl', 0.0) or 0.0) }}，{{ t['urpnl'] }}：{{ '%.2f' % (m.get('unrealized_pnl', 0.0) or 0.0) }}，{{ t['tpnl'] }}：{{ '%.2f' % (m.get('total_pnl', 0.0) or 0.0) }}</div>
     <table>
       <thead>
         <tr>

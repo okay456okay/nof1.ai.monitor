@@ -112,29 +112,32 @@ class PositionDataFetcher:
             
             # 发送GET请求获取数据
             response = requests.get(api_url, timeout=60)
-            response.raise_for_status()  # 如果状态码不是200会抛出异常
-            data = response.json()
+            try:
+                data = response.json()
+            except Exception as e:
+                self.logger.error(f"解析数据失败: {e}，数据内容: {response.text}")
+                data = {
+                    'accountTotals': [],
+                }
             data['accountTotals'] = [i for i in data.get("accountTotals", []) if i['model_id'] in self.models]
+            handled_models = [i['model_id'] for i in data.get("accountTotals", []) if i['model_id'] in self.models]
 
             if len(self.models) != len(data['accountTotals']):
-                self.logger.info(f"小时数据缺失部分模型数据, 获取全量数量")
-                response = requests.get(f'{self.api_url}/account-totals', timeout=60)
+                self.logger.info(f"小时数据缺失部分模型数据, 获取前1小时数据补齐")
+                response = requests.get(f'{self.api_url}/account-totals?lastHourlyMarker={hourly_marker - 1}', timeout=60)
                 response.raise_for_status()
-                data = response.json()
+                previous_data = response.json()
                 try:
-                    handled_models = []
-                    models_data = []
-                    all_positions = data.get("accountTotals", [])
-                    for i in range(-1, -1 - len(all_positions), -1):
-                        model = all_positions[i]['model_id']
+                    all_positions = previous_data.get("accountTotals", [])
+                    for p in all_positions:
+                        model = p['model_id']
                         if model in self.models and model not in handled_models:
                             handled_models.append(model)
-                            models_data.append(all_positions[i])
+                            data['accountTotals'].append(p)
                         if len(handled_models) == len(self.models):
-                            data['accountTotals'] = models_data
                             break
                 except Exception as e:
-                    self.logger.error(f"解析全量数据有问题： {e}，全量数据获取条数: {len(data['accountTotals'])}")
+                    self.logger.error(f"解析前1小时数据有问题： {e}，前一小时数据内容: {previous_data}")
 
             self.logger.info(f"all models id: {[i['id'] for i in data['accountTotals']]}")
             # 转换数据格式以保持向后兼容
